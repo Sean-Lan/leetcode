@@ -27,12 +27,12 @@ struct ListNode {
 
 /**
  *
- * Use curNode and cnt to save the state when traversing the linked list.
+ * Use curNode and carry to save the state when traversing the linked list.
  * Remeber to calculate the tail linked list.
  *
  * Practice managing the memory manully.
  *
- * Node the initializer list is a C++11 feature, so you may be add "-std=c++11"
+ * Node the initializer list is a C++11 feature, so you may need to add "-std=c++11"
  * to enable it.
  *
  */
@@ -40,9 +40,9 @@ struct ListNode {
 class Solution {
 	public:
 		ListNode *addTwoNumbers(ListNode *l1, ListNode *l2) {
-			cnt = 0;
+			carry = 0;
 			int oneBitResult = l1->val + l2->val;
-			cnt = oneBitResult/10;
+			carry = oneBitResult/10;
 			oneBitResult %= 10;
 			curNode= new ListNode(oneBitResult);
 			result = curNode;
@@ -50,10 +50,10 @@ class Solution {
 			l2 = l2->next;
 
 			while(l1 && l2) {
-				oneBitResult =l1->val + l2->val + cnt;
+				oneBitResult =l1->val + l2->val + carry;
 				l1 = l1->next;
 				l2 = l2->next;
-				cnt = oneBitResult/10;
+				carry = oneBitResult/10;
 				oneBitResult %= 10;
 				ListNode *newNode = new ListNode(oneBitResult);
 				curNode->next = newNode;
@@ -64,8 +64,8 @@ class Solution {
 			addTail(l2);
 
 
-			if(cnt) {
-				ListNode *newNode = new ListNode(cnt);
+			if(carry) {
+				ListNode *newNode = new ListNode(carry);
 				curNode->next = newNode;
 				curNode = newNode;
 			}
@@ -74,13 +74,13 @@ class Solution {
 	private:
 		ListNode *curNode;
 		ListNode *result;
-		int cnt;
+		int carry;
 		void addTail(ListNode *pNode) {
 			int oneBitResult;
 			while(pNode) {
-				oneBitResult = pNode->val + cnt;
+				oneBitResult = pNode->val + carry;
 				pNode = pNode->next;
-				cnt = oneBitResult/10;
+				carry = oneBitResult/10;
 				oneBitResult %= 10;
 				ListNode *newNode = new ListNode(oneBitResult);
 				curNode->next = newNode;
