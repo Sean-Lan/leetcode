@@ -52,7 +52,7 @@ class Solution {
              * y < length(s) 
              * Enumerate b from 1 to length(s)-1, we can get diagonal
              * lines sequencelly, and enumerate x from 0 to the maximum
-             * value so that y equals length(s)-1.
+             * value so that y equals length(s)-1 to tranverse the line.
              *
              */
             for (st i = 1; i != s.size(); ++i) {
