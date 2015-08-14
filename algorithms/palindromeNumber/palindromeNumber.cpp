@@ -16,7 +16,7 @@ class Solution {
     public:
         /**
          * Every time get the leftmost and rightmost digit and compare them.
-         * *Note*: power must divide by 100 in every loop since two digits are
+         * *Note*: power must be divided by 100 in every loop since two digits are
          * removed in one loop.
          */
         bool isPalindrome(int x) {
