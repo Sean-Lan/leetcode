@@ -1,3 +1,14 @@
+/**
+ * Sean
+ * 2016-02-06
+ *
+ * https://leetcode.com/problems/divide-two-integers/
+ *
+ * Divide two integers without using multiplication, division and mod operator.
+ *
+ * If it is overflow, return MAX_INT.
+ *
+ */
 #include <iostream>
 #include <climits>
 using namespace std;
@@ -49,5 +60,6 @@ int main() {
     cout << s.divide(-2147483648, 1) << endl;
     int b = -1;
     cout << "a: " << a<< " b: " << b << endl;
-    cout << a/b << endl;
+    // runtime error:
+    /* cout << a/b << endl; */
 }
