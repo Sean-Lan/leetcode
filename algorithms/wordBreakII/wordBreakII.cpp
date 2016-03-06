@@ -73,6 +73,7 @@ void printResult(const vector<string> &results) {
         cout << result << endl;
     }
 }
+
 int main() {
     string s = "catsanddog";
     unordered_set<string> wordDict = {"cat", "cats", "and", "sand", "dog"};
