@@ -4,7 +4,7 @@
  * 2016-03-02
  *
  * https://leetcode.com/problems/merge-intervals/
- * 
+ *
  * Given a collection of intervals, merge all overlapping intervals.
  *
  * For example,
@@ -25,8 +25,8 @@ struct Interval {
     Interval(int s, int e) : start(s), end(e) {}
 };
 
-// First sort, then iterate over intervals, check whether currentInterval and preInterval overlaps.
-// If so, merge them, otherwise, put the smaller one into result vector.
+// First sort, then iterate over intervals, check whether currentInterval and preInterval overlap.
+// If so, merge them, otherwise, put the smaller one into the result vector.
 class Solution {
     private:
         bool overlap(const Interval &interval1, const Interval &interval2) {
@@ -46,13 +46,13 @@ public:
         if (intervals.empty()) return {};
         sort(intervals.begin(), intervals.end(),
                 [](Interval &interval1, Interval &interval2) {
-                    return (interval1.start!=interval2.start) 
+                    return (interval1.start!=interval2.start)
                            ?(interval1.start<interval2.start)
                            :(interval1.end<interval2.end);
                 });
         vector<Interval> res;
         Interval prevInterval = intervals[0];
-        for (int i=1; i<intervals.size(); ++i) {
+        for (size_t i=1; i<intervals.size(); ++i) {
             Interval &currentInterval = intervals[i];
             if (overlap(prevInterval, currentInterval))
                 prevInterval = mergeInterval(prevInterval, currentInterval);
