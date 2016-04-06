@@ -44,8 +44,6 @@ class Solution {
             stack<pair<TreeNode*, TreeNode*>> aStack;
             TreeNode *left = root->left;
             TreeNode *right = root->right;
-            if (!left && !right) return true;
-            if ((!left && right) || (left && !right)) return false;
             while (true) {
                 while (left && right) {
                     if (left->val != right->val) return false;
