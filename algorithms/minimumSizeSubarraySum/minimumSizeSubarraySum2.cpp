@@ -35,37 +35,39 @@ public:
 
         int minL = INT_MAX;
         int end = size -1;
-        int startSum;
         for (int start = 0; start<size; ++start) {
-            if (start == 0)
-                startSum = 0;
-            else
-                startSum = sum[start-1];
-            int pos = firstGreaterOrEqual(start, end, s, sum, startSum);
+            int pos = firstGreaterOrEqual(start, end, s, sum);
             if (pos != -1)
                 minL = min(minL, pos-start+1);
         }
 
         return minL==INT_MAX?0:minL;
-
     }
 
-    int firstGreaterOrEqual(int start, int end, int val, vector<int>& sum, int startSum) {
+private:
+    int firstGreaterOrEqual(int start, int end, int val, vector<int>& sum) {
         int mid;
+        int originalStart = start;
         while (start <= end) {
             if (start == end) {
-                if (sum[start]-startSum >= val)
+                if (getPartSum(originalStart, end, sum) >= val)
                     return start;
                 break;
             }
             mid = (start+end) >> 1;
-            if (sum[mid]-startSum < val) {
+            if (getPartSum(originalStart, mid, sum) < val) {
                 start = mid+1;
             } else {
                 end = mid;
             }
         }
         return -1;
+    }
+
+    inline int getPartSum(int start, int end, vector<int>& sum) {
+        if (start == 0)
+            return sum[end];
+        return sum[end]-sum[start-1];
     }
 };
 
