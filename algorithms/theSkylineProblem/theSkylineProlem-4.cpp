@@ -25,69 +25,71 @@
  *
  */
 #include <iostream>
-#include <utility>
-#include <algorithm>
 #include <vector>
-#include <map>
+#include <algorithm>
+#include <set>
+#include <unordered_map>
 using namespace std;
 
-// use the event based trick to sovle it.
-struct Event {
-    int timeStamp;
-    int height;
-    bool isStart;
-    Event(int timeStamp, int height, bool isStart):
-        timeStamp(timeStamp), height(height), isStart(isStart) {}
-    bool operator< (const Event& e) const {
-        if (timeStamp != e.timeStamp) // first order by the timestamp.
-            return timeStamp < e.timeStamp;
-        if (isStart != e.isStart) // the start event first.
-            return isStart;
-        if (isStart) // if both are start events, the one with the smaller height first.
-            return height > e.height;
-        return height < e.height; // if both are end event, the one with the bigger height first.
+// Using segment tree and lazy propagation.
+class SegTree {
+    vector<int> values;
+public:
+    SegTree(int n): values(vector<int>(n<<2, 0)) {}
+    void update(int root, int left, int right, int leftRange, int rightRange, int value) {
+        if (leftRange > rightRange || leftRange > right || rightRange < left) // no intersection
+            return;
+        if (leftRange <= left && rightRange >= right) {// totally cover
+            values[root] = max(values[root], value);
+            return;
+        }
+
+        // partically
+        int mid = (left+right) >> 1;
+        update(root<<1, left, mid, leftRange, rightRange, value);
+        update((root<<1)+1, mid+1, right, leftRange, rightRange, value);
     }
+
+    int query(int root, int left, int right, int index) {
+        if (left == right)
+            return values[root];
+        int mid = (left+right) >> 1;
+        int res = (index <= mid) ? query(root << 1, left, mid, index) : query((root<<1)+1, mid+1, right, index);
+        return max(res, values[root]); // because of the lazy propagation
+    }
+
 };
 
 class Solution {
 public:
     vector<pair<int, int>> getSkyline(vector<vector<int>>& buildings) {
-        vector<pair<int, int>> contour;
-        vector<Event> events;
+        set<int> endPoints;
         for (auto &building : buildings) {
-            events.emplace_back(building[0], building[2], true);
-            events.emplace_back(building[1], building[2], false);
+            endPoints.insert(building[0]);
+            endPoints.insert(building[1]);
         }
 
-        sort(events.begin(), events.end());
+        // intMap maps endPoints to [0, .., k]
+        // rMap maps [0, .., k] to endPoints
+        unordered_map<int, int> intMap, rMap;
+        int k = 0;
+        for (auto endPoint : endPoints) {
+            intMap[endPoint] = k;
+            rMap[k++] = endPoint;
+        }
+        SegTree segTree(k--);
 
-        map<int, int, std::greater<int>> heightCnts;
+        // build the SegTree
+        for (auto &building : buildings)
+            segTree.update(1, 0, k, intMap[building[0]], intMap[building[1]]-1, building[2]);
 
-        for (auto &event : events) {
-            if (event.isStart) {
-                if (heightCnts.empty()) {
-                    contour.emplace_back(event.timeStamp, event.height);
-                } else {
-                    auto it = heightCnts.begin();
-                    if (event.height > it->first) {
-                        contour.emplace_back(event.timeStamp, event.height);
-                    }
-                }
-                ++heightCnts[event.height];
-            } else {
-                --heightCnts[event.height];
-                if (heightCnts[event.height] == 0) {
-                    heightCnts.erase(event.height);
-                }
-                if (heightCnts.empty()) {
-                    contour.emplace_back(event.timeStamp, 0);
-                } else {
-                    auto it = heightCnts.begin();
-                    if (event.height > it->first) {
-                        contour.emplace_back(event.timeStamp, it->first);
-                    }
-                }
-            }
+        int preHeight = 0, height;
+        vector<pair<int, int>> contour;
+        for (int i=0; i <= k; ++i) { // the k-th height is zero.
+            height = segTree.query(1, 0, k, i);
+            if (preHeight == height) continue;
+            contour.emplace_back(rMap[i], height);
+            preHeight = height;
         }
         return contour;
     }
