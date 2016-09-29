@@ -18,39 +18,28 @@
  *
  * Given "paper", "title", return true.
  *
+ * Note:
+ * You may assume both s and t have the same length.
+ *
  */
-#include <string>
-#include <unordered_map>
 #include <iostream>
+#include <string>
 using namespace std;
 
-// normalize s and t to a string with first character start with 0.
+// compare whether the last position of current character is the same.
 class Solution {
 public:
     bool isIsomorphic(string s, string t) {
-        unordered_map<char, char> mapS;
-        unordered_map<char, char> mapT;
-        char cur = 0;
-        for (auto &c : s) {
-            if (mapS.count(c)) {
-                c = mapS[c];
-            } else {
-                mapS[c] = cur;
-                c = cur++;
-            }
+        int lastPositionS[256] = {0};
+        int lastPositionT[256] = {0};
+        int n = s.size();
+        for (int i=0; i<n; ++i) {
+            if (lastPositionS[s[i]+128] != lastPositionT[t[i]+128])
+                return false;
+            lastPositionS[s[i]+128] = i+1;
+            lastPositionT[t[i]+128] = i+1;
         }
-
-        cur = 0;
-        for (auto &c : t) {
-            if (mapT.count(c)) {
-                c = mapT[c];
-            } else {
-                mapT[c] = cur;
-                c = cur++;
-            }
-        }
-
-        return s == t;
+        return true;
     }
 };
 
