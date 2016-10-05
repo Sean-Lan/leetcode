@@ -38,7 +38,7 @@ public:
             ++count[aPair.first];
             adjancent[aPair.second].push_back(aPair.first);
         }
-        
+
         queue<int> courses;
         int cnt = 0;
         for (int i = 0; i<numCourses; ++i) {
@@ -47,7 +47,7 @@ public:
                 ++cnt;
             }
         }
-        
+
         while (!courses.empty()) {
             int cur = courses.front();
             courses.pop();
