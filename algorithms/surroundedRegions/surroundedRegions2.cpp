@@ -1,7 +1,7 @@
 /**
  *
  * Sean
- * 2016-05-30
+ * 2016-11-16
  *
  * https://leetcode.com/problems/surrounded-regions/
  *
@@ -22,9 +22,10 @@
  *      X O X X
  *
  */
-#include <iostream>
-#include <queue>
 #include <vector>
+#include <iostream>
+#include <numeric>
+#include <string>
 using namespace std;
 
 // The Union Find implementation uses union by rank and path compression.
@@ -34,34 +35,29 @@ private:
     vector<int> roots;
     vector<int> ranks;
 public:
-    Unions(int m, int n) {
-        int size = m*n;
-        roots.resize(size);
-        ranks.resize(size);
-        for (int i=0; i<size; ++i) {
-            roots[i] = i;
-            ranks[i] = 0;
-        }
+    Unions(int size) {
+        roots = vector<int>(size);
+        ranks = vector<int>(size, 0);
+        // fill roots[i] with i
+        iota(roots.begin(), roots.end(), 0);
     }
 
-    int findRoot (int x) {
-        if (x != roots[x]) {
-            roots[x] = findRoot(roots[x]);
-        }
-        return roots[x];
+    int findRoot(int i) {
+        if (roots[i] != i)
+            roots[i] = findRoot(roots[i]);
+        return roots[i];
     }
 
-    void unionAll(int x, int y) {
-        int rootX = findRoot(x);
-        int rootY = findRoot(y);
-
-        if (ranks[rootX] > ranks[rootY]) {
-            roots[rootY] = rootX;
-        } else {
-            roots[rootX] = rootY;
-            if (ranks[rootX] == ranks[rootY]) {
-                ++ranks[rootY];
-            }
+    int unionAll(int i, int j) {
+        int root1 = findRoot(i);
+        int root2 = findRoot(j);
+        if (root1 == root2) return root1;
+        if (ranks[root1] > ranks[root2])
+            return roots[root2] = root1;
+        else {
+            if (ranks[root1] == ranks[root2])
+                ++ ranks[root2];
+            return roots[root1] = root2;
         }
     }
 };
@@ -69,72 +65,68 @@ public:
 class Solution {
 public:
     void solve(vector<vector<char>>& board) {
-        if (board.empty() || board[0].empty()) return;
         int m = board.size();
+        if (m < 3) return;
         int n = board[0].size();
-        Unions unions(m, n);
+        if (n < 3) return;
+
+        Unions unions(m*n);
+        auto onBoundary = [m, n] (int i, int j) {
+            return i == 0 || j == 0 || i == m-1 || j == n-1;
+        };
         int boundary = -1;
-        int cur;
-        for (int i=0; i<m; ++i) {
+        int idx;
+        for (int i=0; i<m; ++i)
             for (int j=0; j<n; ++j) {
-                if (board[i][j] == 'O') {
-                    cur = i*n+j;
-                    if (inBoundary(i, j, m, n)) {
-                        if (boundary != -1) {
-                            unions.unionAll(boundary, cur);
-                        } else {
-                            boundary = cur;
-                        }
-                    }
-                    if (i+1<m && board[i+1][j] == 'O') {
-                        unions.unionAll(cur, (i+1)*n+j);
-                    }
-                    if (j+1<n && board[i][j+1] == 'O') {
-                        unions.unionAll(cur, i*n+j+1);
+                if (board[i][j] == 'X') continue;
+                idx = i*n + j;
+                if (onBoundary(i, j)) {
+                    if (boundary == -1) {
+                        boundary = idx;
+                    } else {
+                        boundary = unions.unionAll(boundary, idx);
                     }
                 }
+                if (i+1 < m && board[i+1][j] == 'O') unions.unionAll(idx, idx+n);
+                if (j+1 < n && board[i][j+1] == 'O') unions.unionAll(idx, idx+1);
             }
-        }
 
         if (boundary == -1) {
-            for (auto &aLine : board) {
-                for (auto &c: aLine) {
-                    c = 'X';
-                }
-            }
+            for (auto &row : board)
+                for (auto &c: row)
+                    if (c == 'O') c = 'X';
             return;
         }
 
-        int boundaryRoot = unions.findRoot(boundary);
-        for (int i=0; i<m; ++i) {
-            for (int j=0; j<n; ++j) {
-                if (unions.findRoot(i*n+j) != boundaryRoot) {
+        boundary = unions.findRoot(boundary);
+        for (int i=0; i<m; ++i)
+            for (int j=0; j<n; ++j)
+                if (board[i][j] == 'O' && unions.findRoot(i*n+j) != boundary)
                     board[i][j] = 'X';
-                }
-            }
-        }
-
-    }
-
-    inline bool inBoundary(int x, int y, int m, int n) {
-        return (x==0 || y==0 || x==m-1 || y==n-1);
     }
 };
 
-
-
-
 int main() {
     Solution solution;
-    vector<string> raw = {"XOOOOOOOOOOOOOOOOOOO","OXOOOOXOOOOOOOOOOOXX","OOOOOOOOXOOOOOOOOOOX","OOXOOOOOOOOOOOOOOOXO","OOOOOXOOOOXOOOOOXOOX","XOOOXOOOOOXOXOXOXOXO","OOOOXOOXOOOOOXOOXOOO","XOOOXXXOXOOOOXXOXOOO","OOOOOXXXXOOOOXOOXOOO","XOOOOXOOOOOOXXOOXOOX","OOOOOOOOOOXOOXOOOXOX","OOOOXOXOOXXOOOOOXOOO","XXOOOOOXOOOOOOOOOOOO","OXOXOOOXOXOOOXOXOXOO","OOXOOOOOOOXOOOOOXOXO","XXOOOOOOOOXOXXOOOXOO","OOXOOOOOOOXOOXOXOXOO","OOOXOOOOOXXXOOXOOOXO","OOOOOOOOOOOOOOOOOOOO","XOOOOXOOOXXOOXOXOXOO"};
+    vector<string> raw = { "XOXOXO","OXOXOX","XOXOXO","OXOXOX" };
     vector<vector<char>> board = vector<vector<char>>(raw.size(), vector<char>(raw[0].size()));
+
     for (int i=0; i<raw.size(); ++i) {
         string& aLine = raw[i];
         for (int j=0; j<raw[0].size(); ++j) {
             board[i][j] = aLine[j];
         }
     }
+
+    for (auto &cv : board) {
+        for (char c: cv)
+            cout << c << " ";
+        cout << endl;
+    }
+    cout << endl;
+
     solution.solve(board);
+
     for (auto &cv : board) {
         for (char c: cv)
             cout << c << " ";
