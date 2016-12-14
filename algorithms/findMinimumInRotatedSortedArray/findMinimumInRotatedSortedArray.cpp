@@ -21,16 +21,21 @@ using namespace std;
 class Solution {
 public:
     int findMin(vector<int>& nums) {
-        int start = 0;
-        int end = (int)nums.size()-1;
-        int mid;
-        // invariant: the minimum is in nums[start..end]
+        int n = nums.size();
+        int lastNumber = nums[n-1];
+
+        auto p = [&lastNumber, &nums] (int index) {
+            return nums[index] <= lastNumber;
+        };
+        
+        int start = 0, end = n-1, mid;
         while (start < end) {
-            mid = (start+end)>>1;
-            if (nums[mid] < nums[end])
+            mid = start + (end-start)/2;
+            if (p(mid)) {
                 end = mid;
-            else
+            } else {
                 start = mid+1;
+            }
         }
         return nums[start];
     }
