@@ -30,47 +30,37 @@ public:
     string decodeString(string s) {
         stack<string> strStack;
         stack<int> cntStack;
-        string res;
-        string curStr; // current part string start and end of `s` or inside a certain `[]`
-        int cur = 0;
+        string current;
+        int cnt = 0;
         for (auto c : s) {
-            if (c >= '0' && c <= '9') {
-                if (cur == 0 && !curStr.empty()) {
-                    if (cntStack.empty()) {
-                            res += curStr;
-                        } else {
-                            strStack.push(curStr);
-                        }
-                    curStr = "";
+            if (isdigit(c)) {
+                if (cnt) {
+                    cnt = 10*cnt + c-'0';
+                } else {
+                    // first digit character, push the current string into strStack
+                    cnt = c - '0';
+                    strStack.push(current);
+                    current = "";
                 }
-                cur = cur*10 + c-'0';
-                continue;
-            }
-            if (c == '[') {
-                cntStack.push(cur);
-                cur = 0;
-                continue;
-            }
-            if (c == ']') {
-                int cnt = cntStack.top();
+            } else if (c == '[') {
+                cntStack.push(cnt);
+                cnt = 0;
+            } else if (c == ']') {
+                int lastCnt = cntStack.top();
                 cntStack.pop();
-                string part = curStr;
-                for (int i=0; i<cnt-1; ++i) {
-                    curStr += part;
-                }
-
-                if (!strStack.empty()) {
-                    part = strStack.top();
-                    strStack.pop();
-                    curStr = part + curStr;
-                }
-                continue;
+                string tmp;
+                // repeat the current string lastCnt times
+                for (int i=0; i<lastCnt; ++i)
+                    tmp += current;
+                // append the prevoius part
+                string lastStr = strStack.top();
+                strStack.pop();
+                current = lastStr + tmp;
+            } else {
+                current.push_back(c);
             }
-            curStr.push_back(c);
         }
-        // add remaining part
-        if (!curStr.empty()) res += curStr;
-        return res;
+        return current;
     }
 };
 
