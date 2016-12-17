@@ -43,9 +43,9 @@ struct Event {
             return timeStamp < e.timeStamp;
         if (isStart != e.isStart) // the start event first.
             return isStart;
-        if (isStart) // if both are start events, the one with the smaller height first.
+        if (isStart) // if both are start events, the one with the bigger height first.
             return height > e.height;
-        return height < e.height; // if both are end event, the one with the bigger height first.
+        return height < e.height; // if both are end event, the one with the smaller height first.
     }
 };
 
