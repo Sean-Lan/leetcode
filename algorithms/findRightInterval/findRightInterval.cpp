@@ -58,7 +58,7 @@ public:
         for (int i=0; i<n; ++i) {
             aMap[intervals[i].start] = i;
         }
-        
+
         for (int i=0; i<n; ++i) {
             auto it = aMap.lower_bound(intervals[i].end);
             if (it == aMap.end()) {
