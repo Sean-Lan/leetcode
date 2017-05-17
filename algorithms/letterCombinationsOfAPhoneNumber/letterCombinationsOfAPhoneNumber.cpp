@@ -9,43 +9,47 @@
  *
  */
 
-#include <unordered_map>
 #include <iostream>
 #include <string>
 #include <vector>
 using namespace std;
 
-unordered_map<char, vector<string>> numMap = {
-    {'1', {"_"}},
-    {'2', {"a","b","c"}},
-    {'3', {"d","e","f"}},
-    {'4', {"g","h","i"}},
-    {'5', {"j","k","l"}},
-    {'6', {"m","n","o"}},
-    {'7', {"p","q","r","s"}},
-    {'8', {"t","u","v"}},
-    {'9', {"w","x","y","z"}},
-    {'0', {" "}}
+vector<string> table = {
+    " ",
+    "_",
+    "abc",
+    "def",
+    "ghi",
+    "jkl",
+    "mno",
+    "pqrs",
+    "tuv",
+    "wxyz"
 };
 
 class Solution {
-    public:
-        vector<string> letterCombinations(string digits) {
-            if (digits.size()==0) return {};
-            if (digits.size()==1) return numMap[digits[0]];
-
-            vector<string> result;
-            auto sVec = letterCombinations(digits.substr(0, digits.size()-1));
-            auto& letters = numMap[digits[digits.size()-1]];
-            for (string& s : sVec) {
-                for (string& letter: letters) {
-                    result.push_back(s+letter);
-                }
-            }
-            return result;
+    void dfs(string &cur, vector<string> &res, const string &digits) {
+        if (cur.size() == digits.size()) {
+            res.push_back(cur);
+            return;
         }
-};
+        string &possibleChars = table[digits[cur.size()] - '0'];
+        for (auto c : possibleChars) {
+            cur.push_back(c);
+            dfs(cur, res, digits);
+            cur.pop_back();
+        }
+    }
 
+public:
+    vector<string> letterCombinations(string digits) {
+        if (digits.empty()) return {};
+        vector<string> res;
+        string cur;
+        dfs(cur, res, digits);
+        return res;
+    }
+};
 
 void printResult (vector<string> & result) {
     for (auto& s : result)
