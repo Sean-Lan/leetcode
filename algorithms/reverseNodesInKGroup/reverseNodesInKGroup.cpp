@@ -29,90 +29,54 @@ struct ListNode {
     ListNode(int x) : val(x), next(NULL) {}
 };
 
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
 class Solution {
-    public:
-        ListNode* reverseKGroup(ListNode* head, int k) {
-            if (!head) return NULL;
-            ListNode fakeHead(0);
-            fakeHead.next = head;
-            ListNode *lastEnd = &fakeHead;
-            ListNode *nextBeg;
-            // reverse every k nodes.
-            do {
-                nextBeg = lastEnd->next;
-                auto range = reverseList(nextBeg, k);
-                lastEnd->next = range.first;
-                lastEnd = range.second;
-            } while (lastEnd);
-            return fakeHead.next;
-        }
+    // p1 -> x -> ... -> p2 -> y -> ... =>
+    // p1 -> y -> x -> ... -> p2 -> ...
+    void shift(ListNode *p1, ListNode *p2) {
+        ListNode *tmp1, *tmp2;
+        tmp1 = p1->next; // x
+        tmp2 = p2->next; // y
+        p1->next = tmp2;
+        p2->next = tmp2->next;
+        tmp2->next = tmp1;
+    }
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        ListNode fakeHead(0);
+        fakeHead.next = head;
+        ListNode *preCur = &fakeHead;
+        ListNode *cur = fakeHead.next;
+        ListNode *tmp;
 
-    private:
-        /**
-         * First check whether there is enough k nodes from head.
-         * If there is enough, then reverse k nodes from head.
-         * Return a range represents the reversed list.
-         */
-        pair<ListNode*,ListNode *> reverseList(ListNode *head, int k) {
-            if (!head) return {NULL, NULL};
-            ListNode *p1 = head;
-            ListNode *p2 = p1->next;
-            // first check
-            int i=1;
-            for (; i<k && p2; ++i, p2=p2->next);
-            if (i<k) return {head, NULL};
-
-            // then reverse
-            p2 = p1->next;
-            i = 1;
-            for (; i<k; ++i) {
-                p1->next = p2->next;
-                p2->next = head;
-                head = p2;
-                p2 = p1->next;
+        do {
+            int i;
+            tmp = cur;
+            for (i=0; i<k; ++i) {
+                if (!tmp) break;
+                tmp = tmp->next;
             }
-            return {head, p1};
-        }
+            if (i != k) break; // < k nodes remained
+
+            // reverse the k nodes [cur, tmp]
+            for (i=1; i<k; ++i) { // only need k-1 times shift
+                shift(preCur, cur);
+            }
+            preCur = cur;
+            cur = preCur->next;
+        } while (cur);
+
+        return fakeHead.next;
+    }
 };
 
-void printList(ListNode *head) {
-    if (head) {
-        cout << head->val;
-        head = head->next;
-    }
-    while (head) {
-        cout << "->" << head->val;
-        head = head->next;
-    }
-    cout << endl;
-}
-
-ListNode *constructList(vector<int> values) {
-    ListNode fakeHead = ListNode(0);
-    ListNode *current = &fakeHead;
-    for (auto &val : values) {
-        current->next = new ListNode(val);
-        current = current->next;
-    }
-    return fakeHead.next;
-}
-
-void deleteList(ListNode *head) {
-    if (!head) return;
-    ListNode *current = head->next;
-    ListNode *tmp;
-    while (current) {
-        tmp = current;
-        current = current->next;
-        delete tmp;
-    }
-}
-
 int main() {
-    ListNode *testList = constructList({1,2,3,4,5});
-    Solution s;
-    printList(testList);
-    testList = s.reverseKGroup(testList, 6);
-    printList(testList);
-    deleteList(testList);
+    return 0;
 }
