@@ -24,23 +24,23 @@ struct ListNode {
 };
 
 class Solution {
-    public:
-        ListNode* swapPairs(ListNode* head) {
-            if (!head) return NULL;
-            ListNode fakeHead = ListNode(0);
-            fakeHead.next = head;
-            ListNode *p1 = &fakeHead;
-            ListNode *p2 = p1->next;
-            ListNode *p3 = p2->next;
-            while (p1 && p2 && p3) {
-                p1->next = p3;
-                p2->next = p3->next;
-                p3->next = p2;
-                p1 = p2;
-                if (!p2->next) break;
-                p2 = p2->next;
-                p3 = p2->next;
-            }
-            return fakeHead.next;
+public:
+    ListNode* swapPairs(ListNode* head) {
+        if (!head || !head->next) return head;
+        ListNode fakeHead(0);
+        fakeHead.next = head;
+        ListNode *p0 = &fakeHead;
+        ListNode *p1, *p2;
+        while ((p1 = p0->next) && (p2 = p1->next)) {
+            p0->next = p2;
+            p1->next = p2->next;
+            p2->next = p1;
+            p0 = p1;
         }
+        return fakeHead.next;
+    }
 };
+
+int main() {
+    return 0;
+}
