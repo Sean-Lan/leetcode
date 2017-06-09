@@ -3,3 +3,4 @@ in.txt
 out.txt
 test.cpp
 test
+*.swp
