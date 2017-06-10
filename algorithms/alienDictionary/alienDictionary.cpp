@@ -48,6 +48,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <queue>
 #include <iostream>
 #include <vector>
 
@@ -77,25 +78,29 @@ public:
             s = t;
         }
 
-        unordered_set<char> frees;
+        queue<char> frees;
         for (auto c : chars) {
             if (pres.count(c) == 0 || pres[c].empty())
-                frees.insert(c);
+                frees.push(c);
         }
 
         string res;
+        char c;
         while (!frees.empty()) {
-            char c = *frees.begin();
-            frees.erase(frees.begin());
+            char c = frees.front();
+            frees.pop();
             res.push_back(c);
             auto &suc = sucs[c];
             for (auto c1 : suc) {
                 auto &pre = pres[c1];
                 pre.erase(c);
-                if (pre.empty()) frees.insert(c1);
+                if (pre.empty()) frees.push(c1);
             }
         }
-
         return res.size() == chars.size() ? res : "";
     }
 };
+
+int main() {
+    return 0;
+}
