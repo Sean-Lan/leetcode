@@ -31,32 +31,32 @@ using namespace std;
 class Solution {
 public:
     vector<int> findOrder(int numCourses, vector<pair<int, int>>& prerequisites) {
-        vector<vector<int>> adjancents(numCourses);
-        vector<int> counts(numCourses, 0);
-        for (auto &aPair : prerequisites) {
-            ++ counts[aPair.first];
-            adjancents[aPair.second].push_back(aPair.first);
-        }
+        vector<int> preCnts(numCourses, 0);
+        vector<vector<int>> succs(numCourses);
 
+        for (auto &aPair : prerequisites) {
+            succs[aPair.second].push_back(aPair.first);
+            ++ preCnts[aPair.first];
+        }
 
         queue<int> aQueue;
-        for (int i=0; i<numCourses; ++i)
-            if (counts[i] == 0)
-                aQueue.push(i);
+        for (int i=0; i<numCourses; ++i) {
+            if (preCnts[i] == 0) aQueue.push(i);
+        }
 
-        vector<int> result;
+        vector<int> res;
+
         int cur;
-        while (!aQueue.empty()) {
+        while(!aQueue.empty()) {
             cur = aQueue.front();
+            res.push_back(cur);
             aQueue.pop();
-            result.push_back(cur);
-            for (auto &neighbour : adjancents[cur]) {
-                -- counts[neighbour];
-                if (counts[neighbour] == 0)
-                    aQueue.push(neighbour);
+            for (auto next : succs[cur]) {
+                if (--preCnts[next] == 0) aQueue.push(next);
             }
         }
-        return result.size() == numCourses ? result : vector<int>();
+
+        return res.size() == numCourses ? res : vector<int>();
     }
 };
 
