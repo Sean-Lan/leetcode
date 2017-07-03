@@ -37,8 +37,6 @@ class Solution {
     typedef long long ll;
 public:
     int fourSumCount(vector<int>& A, vector<int>& B, vector<int>& C, vector<int>& D) {
-        sort(A.begin(), A.end());
-        sort(B.begin(), B.end());
         int n = A.size();
         ll total;
         int cnt = 0;
