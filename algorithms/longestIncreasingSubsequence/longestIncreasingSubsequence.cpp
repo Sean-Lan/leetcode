@@ -24,18 +24,15 @@ using namespace std;
 // O(n*log(n))
 // binary search with length
 class Solution {
-    // TTTTFFF find the last T
+    // FFFTTT find the first T
     int bs_search(int s, int e, function<bool(int)> p) {
         int mid;
         while (s < e) {
             mid = s + (e-s)/2;
-            if (s+1 == e) {
-                return p(e) ? e : s;
-            }
             if (p(mid)) {
-                s = mid;
+                e = mid;
             } else {
-                e = mid - 1;
+                s = mid + 1;
             }
         }
         return s;
@@ -44,18 +41,17 @@ public:
     int lengthOfLIS(vector<int>& nums) {
         if (nums.empty()) return 0;
         int n = nums.size();
-        vector<int> table(n+1, INT_MAX);
-        table[0] = INT_MIN;
-        // table[i] means the end value of increasing sequence of length i
-        vector<int> dp(n, 1);
+        vector<int> table(n, INT_MAX);
+        // table[i-1] means the end value of increasing sequence of length i
+        int idx;
         int maxLen = 1;
         for (int i=0; i<n; ++i) {
             int cur = nums[i];
-            dp[i] = 1 + bs_search(0, i, [&] (int len) {
-                return table[len] < cur;
+            idx = bs_search(0, i, [&] (int x) {
+                return table[x] >= cur;
             });
-            table[dp[i]] = cur;
-            maxLen = max(maxLen, dp[i]);
+            table[idx] = cur;
+            maxLen = max(maxLen, idx+1);
         }
         return maxLen;
     }
