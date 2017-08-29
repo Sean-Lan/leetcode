@@ -14,67 +14,46 @@
 #include <stack>
 using namespace std;
 
-// O(n^2).
-// First use DP to get the histo heights level by level, then use a stakc similar to Largest Rectangle in Histogram problem
-// to get the max area level by level.
+// O(m*n)
+// monotonic increasing queue
+// every time an index i is pop out from the stack, which mean we get a height <= the maximum height of the queue
+// we can obtain the rightmost index of height < heights[i] (the previous index in the stack) and thus we can get the area
+// formed with the height to be popped out and width (index difference).
+// add an 0 to it to pop out all the remaining indexes in the stack
 class Solution {
+    int getMaxArea(vector<int> &heights) {
+        int n = heights.size();
+        stack<int> s;
+        int area = 0;
+        for (int i=0; i<=n; ++i) {
+            int h = i == n ? 0 : heights[i];
+            while (!s.empty()  && heights[s.top()] >= h) {
+                int maxH = heights[s.top()];
+                s.pop();
+                area = max(area,  maxH * (s.empty() ? i : i-s.top()-1));
+            }
+            s.push(i);
+        }
+        return area;
+    }
 public:
     int maximalRectangle(vector<vector<char>>& matrix) {
-        if (matrix.empty()) return 0;
-        vector<vector<int>> histos = vector<vector<int>>(matrix.size(), vector<int>(matrix[0].size(), 0));
-        int m = matrix.size();
-        int n = matrix[0].size();
-        auto &firstLine = matrix[0];
-        auto &firstHisto = histos[0];
-        for (int i=0; i<n; ++i) {
-            firstHisto[i] = (firstLine[i]=='1');
-        }
-
-        for (int i=1; i<m; ++i) {
-            auto &lastHisto = histos[i-1];
-            auto &curHisto = histos[i];
-            auto &curLine = matrix[i];
+        if (matrix.empty() || matrix[0].empty()) return 0;
+        int m = matrix.size(), n = matrix[0].size();
+        vector<int> heights(n, 0);
+        int area = 0;
+        for (int i=0; i<m; ++i) {
+            auto &row = matrix[i];
             for (int j=0; j<n; ++j) {
-                if (curLine[j] == '1') {
-                    curHisto[j] = lastHisto[j]+1;
-                }
+                if (row[j] == '0') heights[j] = 0;
+                else ++heights[j];
             }
+            area = max(area, getMaxArea(heights));
         }
-
-        int maxArea = 0;
-        for (auto &histo : histos) {
-            maxArea = max(maxArea,
-                        maxRectArea(histo));
-        }
-
-        return maxArea;
-    }
-
-    int maxRectArea(vector<int> &histo) {
-        histo.push_back(-1);
-        stack<int> aStack;
-        int i = 0;
-        int size = histo.size();
-        int maxArea = 0;
-        int maxH = 0;
-        while (i < size) {
-            if (aStack.empty() || histo[i] > histo[aStack.top()]) {
-                aStack.push(i);
-                ++i;
-            } else {
-                maxH = histo[aStack.top()];
-                aStack.pop();
-                maxArea = max(maxArea,
-                              maxH * (aStack.empty()?i:i-aStack.top()-1));
-            }
-        }
-        return maxArea;
+        return area;
     }
 };
 
 int main() {
-    vector<vector<char>> matrix =
-            { {'0', '0', '1', '1'}, {'0', '1', '1', '1'}, {'0', '1', '1', '1'} };
-    Solution solution;
-    cout << solution.maximalRectangle(matrix) << endl;
+    return 0;
 }
