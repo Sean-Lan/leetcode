@@ -1,7 +1,7 @@
 /**
  *
  * Sean
- * 2017-03-10
+ * 2017-08-31
  *
  * https://leetcode.com/problems/beautiful-arrangement/?tab=Description
  *
@@ -40,27 +40,26 @@ using namespace std;
 
 // DFS with backtracking
 class Solution {
-    int dfs(vector<int> &arr, vector<bool> &used, int cur) {
-        int n = arr.size();
-        if (cur == n + 1) {
-            return 1;
-        }
+    int sovle(int index, vector<bool> &mark, int N) {
+        if (index == N+1) return 1;
         int cnt = 0;
-        for (int i=1; i<=n; ++i) {
-            if (!used[i-1] && (i % cur == 0 || cur % i==0)) {
-                used[i-1] = true;
-                arr[cur-1] = i;
-                cnt += dfs(arr, used, cur+1);
-                used[i-1] = false;
+        for (int i=1; i<=N; ++i) {
+            if (!mark[i] && (i%index == 0 || index%i == 0)) {
+                mark[i] = true;
+                cnt += sovle(index+1, mark, N);
+                mark[i] = false;
             }
         }
         return cnt;
     }
 public:
     int countArrangement(int N) {
-        vector<int> arr(N);
-        iota(arr.begin(), arr.end(), 1);
-        vector<bool> used(N, false);
-        return dfs(arr, used, 1);
+        vector<int> path;
+        vector<bool> mark(N+1, false);
+        return sovle(1, mark, N);
     }
 };
+
+int main() {
+    return 0;
+}
