@@ -27,22 +27,23 @@ using namespace std;
 
 // Greedy
 class Solution {
-    public:
-        int jump(vector<int> &nums) {
-            if (nums.size() <= 1) return 0;
-            int maxRangeSofar = 0;
-            int maxNext = 0;
-            int lastIndex = nums.size()-1;
-            int step = 0;
-            int current = 0;
-            while (maxRangeSofar < lastIndex) {
-                ++step;
-                for (; current<=maxRangeSofar; ++current)
-                    maxNext = max(maxNext, current + nums[current]);
-                maxRangeSofar = maxNext;
+public:
+    int jump(vector<int>& nums) {
+        int step = 0;
+        int n = nums.size();
+        int curStepFarthest = 0;
+        int nextStepFarthest = 0;
+        int i = 0;
+        while (curStepFarthest < n-1) {
+            while (i <= curStepFarthest) {
+                nextStepFarthest = max(nextStepFarthest, i+nums[i]);
+                ++i;
             }
-            return step;
+            curStepFarthest = nextStepFarthest;
+            ++step;
         }
+        return step;
+    }
 };
 
 int main() {
