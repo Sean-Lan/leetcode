@@ -1,7 +1,7 @@
 /**
  *
  * Sean
- * 2016-12-08
+ * 2017-09-05
  *
  * https://leetcode.com/problems/meeting-rooms/
  *
@@ -29,15 +29,17 @@ class Solution {
 public:
     bool canAttendMeetings(vector<Interval>& intervals) {
         if (intervals.empty()) return true;
-        sort(intervals.begin(), intervals.end(), [](const Interval& in1, const Interval& in2) {
-            if (in1.start != in2.start) return in1.start < in2.start;
-            return in1.end < in2.end;
+        sort(intervals.begin(), intervals.end(), [](const Interval& i1, const Interval& i2) {
+            if (i1.start != i2.start) return i1.start < i2.start;
+            return i1.end < i2.end;
         });
+
         int end = intervals[0].end;
-        for (int i=1; i<intervals.size(); ++i) {
-            const auto& interval = intervals[i];
+        int n = intervals.size();
+        for (int i=1; i<n; ++i) {
+            auto interval = intervals[i];
             if (interval.start < end) return false;
-            end = max(end, interval.end);
+            end = interval.end;
         }
         return true;
     }
