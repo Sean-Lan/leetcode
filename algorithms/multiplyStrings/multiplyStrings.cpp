@@ -1,93 +1,91 @@
+/**
+ *
+ * Sean
+ * 2017-09-06
+ *
+ * https://leetcode.com/problems/multiply-strings/description/
+ *
+ * Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2.
+ *
+ * Note:
+ * The length of both num1 and num2 is < 110.
+ * Both num1 and num2 contains only digits 0-9.
+ * Both num1 and num2 does not contain any leading zero.
+ * You must not use any built-in BigInteger library or convert the inputs to integer directly.
+ *
+ */
 #include <string>
-#include <algorithm>
 #include <iostream>
-
+#include <algorithm>
 using namespace std;
 
-void printTmpResult(string result) {
-    for (auto &c : result) c+='0';
-    reverse(result.begin(), result.end());
-    cout << "tmp: " << result << endl;
-}
-
+// big number addition
 class Solution {
-    public:
-        string add(string num1, string num2) {
-            string result;
-            int len1 = num1.size();
-            int len2 = num2.size();
-            int cnt = 0, tmpSum = 0;
-            int i=0;
-            for (i=0; i<len1&&i<len2; ++i) {
-                tmpSum = cnt+num1[i]+num2[i];
-                result.push_back(tmpSum%10);
-                cnt = tmpSum/10;
-            }
+    string add(string &num1, string &num2) {
+        int m = num1.size();
+        int n = num2.size();
+        int carry = 0;
+        string res;
+        int i=0, j=0;
 
-            for (int j=i; j<len1; ++j) {
-                tmpSum = cnt+num1[j];
-                result.push_back(tmpSum%10);
-                cnt = tmpSum/10;
-            }
-            
-            for (int j=i; j<len2; ++j) {
-                tmpSum = cnt+num2[j];
-                result.push_back(tmpSum%10);
-                cnt = tmpSum/10;
-            }
-
-            if (cnt)
-                result.push_back(1);
-            return result;
+        while (i<m && j<n) {
+            int tmp = carry + num1[i] + num2[j] - '0' - '0';
+            carry = tmp/10;
+            res.push_back('0' + tmp%10);
+            ++i; ++j;
         }
 
-        string multiplyOneDigit(string num1, char oneDigit, int shiftCnt) {
-            if (oneDigit == 0)
-                return {0};
-            string result;
-            for (int i=0; i<shiftCnt; i++)
-                result.push_back(0);
-            int cnt = 0, tmp = 0;
-            for (auto &c : num1) {
-                tmp = cnt + c*oneDigit;
-                result.push_back(tmp%10);
-                cnt = tmp/10;
-            }
-            if (cnt) result.push_back(cnt);
-            return result;
+        while (i<m) {
+            int tmp = carry + num1[i] - '0';
+            carry = tmp/10;
+            res.push_back('0' + tmp%10);
+            ++i;
         }
 
-    public:
-        string multiply(string num1, string num2) {
-            if (num1.empty() || num2.empty())
-                return "";
-            if (num1 == "0" || num2 == "0")
-                return "0";
-            // preprocessing
-            for (auto &c : num1) c -= '0';
-            for (auto &c : num2) c -= '0';
-            reverse(num1.begin(), num1.end());
-            reverse(num2.begin(), num2.end());
-
-            string result = {0};
-            int shiftCnt = 0;
-            for (auto &c : num1) {
-                result = add(result, multiplyOneDigit(num2, c, shiftCnt));
-                ++shiftCnt;
-            }
-            for (auto &c: result) c += '0';
-            reverse(result.begin(), result.end());
-            return result;
+        while (j<n) {
+            int tmp = carry + num2[j] - '0';
+            carry = tmp/10;
+            res.push_back('0' + tmp%10);
+            ++j;
         }
+
+        if (carry) res.push_back('0' + carry);
+        return res;
+    }
+    string multiply(string &num, char c) {
+        if (c == '0') return "0";
+        int carry = 0;
+        int n = num.size();
+        int x = c-'0';
+        string res;
+        for (int i=0; i<n; ++i) {
+            int tmp = carry + (num[i]-'0') * x;
+            carry = tmp/10;
+            res.push_back('0' + tmp%10);
+        }
+        if (carry) res.push_back(carry+'0');
+        return res;
+    }
+public:
+    string multiply(string num1, string num2) {
+        reverse(num1.begin(), num1.end());
+        reverse(num2.begin(), num2.end());
+
+        int n = num1.size();
+        string res = "0";
+        for (int i=0; i<n; ++i) {
+            string product = multiply(num2, num1[i]);
+            string prefix(i, '0');
+            if (product != "0") {
+                product = prefix + product;
+            }
+            res = add(res, product);
+        }
+
+        return string(res.rbegin(), res.rend());
+    }
 };
 
-
 int main() {
-    Solution solution;
-    string num1 = "408", num2 = "5";
-    string result = solution.multiply(num1, num2);
-
-    cout << result << endl;
-
-
+    return 0;
 }
