@@ -1,7 +1,7 @@
 /**
  *
  * Sean
- * 2016-03-18
+ * 2017-09-06
  *
  * https://leetcode.com/problems/text-justification/
  *
@@ -39,60 +39,62 @@
 #include <vector>
 using namespace std;
 
-class Solution {
-public:
-    vector<string> fullJustify(vector<string>& words, int maxWidth) {
-        vector<string> result;
-        vector<string> currentLine;
-        int idx = 0;
-        int currentLength = 0;
-        int LEN = words.size();
-        while (idx < LEN) {
-            currentLength += (currentLine.empty())?words[idx].size():words[idx].size()+1;
-            if (currentLength <= maxWidth) {
-                currentLine.push_back(words[idx]);
-                ++idx;
-            } else {
-                currentLength -= words[idx].size()+1;
-                int diff = maxWidth-currentLength;
-                if (currentLine.size() == 1) {
-                    result.push_back(currentLine[0]+string(diff, ' '));
-                } else {
-                    int space = diff/(currentLine.size()-1)+1;
-                    int remainder = diff%(currentLine.size()-1);
-                    string aLine = currentLine[0];
-                    int i=1;
-                    for (; i<=remainder; ++i) {
-                        aLine += string(space+1, ' ');
-                        aLine += currentLine[i];
-                    }
-                    for (; i<currentLine.size(); ++i) {
-                        aLine += string(space, ' ');
-                        aLine += currentLine[i];
-                    }
-                    result.push_back(aLine);
-                }
-                currentLength = 0;
-                currentLine.clear();
-            }
-        }
-
-        // the last line.
-        string lastLine = currentLine[0];
-        for (int i=1; i<currentLine.size(); ++i) {
-            lastLine.push_back(' ');
-            lastLine += currentLine[i];
-        }
-        result.push_back(lastLine+string(maxWidth-lastLine.size(), ' '));
-        return result;
-    }
-};
 
 void printResult(const vector<string> &result) {
     for (auto &s : result)
         cout << s << endl;
     cout << endl;
 }
+
+class Solution {
+    string format(vector<string> &words, int s, int e, bool left, int maxWidth) {
+        string res;
+        if (left) {
+            for (int i=s; i<=e; ++i) {
+                if (i!=s) res += ' ';
+                res += words[i];
+            }
+            while (res.size() < maxWidth) res.push_back(' ');
+            return res;
+        }
+
+        int cumSum = 0;
+        for (int i=s; i<=e; ++i) cumSum += words[i].size();
+        int base = (maxWidth - cumSum) / (e-s);
+        int r = (maxWidth - cumSum) % (e-s);
+        res= words[s];
+        for (int i=s+1; i<=e; ++i) {
+            for (int j=0; j<base; ++j) res += ' ';
+            if (r) { r--; res += ' '; }
+            res += words[i];
+        }
+        return res;
+    }
+public:
+    vector<string> fullJustify(vector<string>& words, int maxWidth) {
+        int n = words.size();
+        vector<string> res;
+        int cumLength = 0;
+        int s = 0, e;
+        while (s < n) {
+            cumLength = words[s].size();
+            e = s+1;
+            while (e < n) {
+                cumLength += 1 + words[e].size();
+                if (cumLength > maxWidth) {
+                    --e;
+                    break;
+                }
+                ++e;
+            }
+            if (e == n) e = n-1;
+            bool left = e == n-1 || e == s;
+            res.push_back(format(words, s, e, left, maxWidth));
+            s = e+1;
+        }
+        return res;
+    }
+};
 
 int main() {
     Solution solution;
