@@ -1,7 +1,7 @@
 /**
  *
  * Sean
- * 2016-02-28
+ * 2017-09-27
  *
  * https://leetcode.com/problems/word-break-ii/
  *
@@ -22,61 +22,51 @@
 #include <unordered_set>
 using namespace std;
 
-/**
- * Use DFS and use vector<bool> impossible to perform the pruning work.
- */
 class Solution {
-    private:
-        void dfs(const string &s, int pos, unordered_set<string> &wordDict,
-                vector<bool> &impossible, vector<string> &currentRes, vector<string> &results) {
-            if (impossible[pos]) return;
-            int len = s.size();
-            string word;
-            int originalSize = results.size();
-            for (int j=pos+1; j<=len; ++j) {
-                word = s.substr(pos, j-pos);
-                if (wordDict.count(word)) {
-                    if (j == len) {
-                        string res;
-                        for (auto &s : currentRes) {
-                            res += s+' ';
-                        }
-                        res += word;
-                        results.push_back(res);
-                    } else {
-                        currentRes.push_back(word);
-                        dfs(s, j, wordDict, impossible, currentRes, results);
-                        currentRes.pop_back();
+    string buildSentence(vector<string> &path) {
+            string sentence;
+            int sz = path.size();
+            sentence += path[0];
+            for (int i=1; i<sz; ++i) {
+                        sentence += ' ';
+                        sentence += path[i];
                     }
-                }
-            }
-            if (results.size() == originalSize)
-                impossible[pos] = true;
+            return sentence;
         }
+    bool solve(vector<string> &path, vector<string> &res, const string &s, int index) {
+            int n = s.size();
+            if (index < n && !cache[index]) return false;
+            if (index == n) {
+                        res.push_back(buildSentence(path));
+                        return true;
+                    }
 
-    public:
-        vector<string> wordBreak(string s, unordered_set<string>& wordDict) {
-            if (s.empty() || wordDict.empty()) return {};
-            vector<bool> impossible(s.size());
-            vector<string> results;
-            vector<string> currentRes;
-            dfs(s, 0, wordDict, impossible, currentRes, results);
-            return results;
+            bool canBreak = false;
+            for (int i=index; i<n; ++i) {
+                        string word = s.substr(index, i-index+1);
+                        if (table.count(word)) {
+                                        path.push_back(word);
+                                        if (solve(path, res, s, i+1)) canBreak = true;
+                                        path.pop_back();
+                                    }
+                    }
+
+            return cache[index] = canBreak;
+        }
+    unordered_set<string> table;
+    vector<int> cache;
+public:
+    vector<string> wordBreak(string s, vector<string>& wordDict) {
+            table.clear();
+            for (auto &word : wordDict) table.insert(word);
+            vector<string> path;
+            vector<string> res;
+            cache = vector<int>(s.size(), true);
+            solve(path, res, s, 0);
+            return res;
         }
 };
 
-void printResult(const vector<string> &results) {
-    for (auto &result : results) {
-        cout << result << endl;
-    }
-}
-
 int main() {
-    string s = "catsanddog";
-    unordered_set<string> wordDict = {"cat", "cats", "and", "sand", "dog"};
-    Solution solution;
-    printResult(solution.wordBreak(s, wordDict));
-    s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-    wordDict = {"a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa"};
-    printResult(solution.wordBreak(s, wordDict));
+    return 0;
 }
