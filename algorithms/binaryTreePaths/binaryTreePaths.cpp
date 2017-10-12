@@ -1,7 +1,7 @@
 /**
  *
  * Sean
- * 2016-11-26
+ * 2017-10-12
  *
  * https://leetcode.com/problems/binary-tree-paths/
  *
@@ -31,42 +31,36 @@ struct TreeNode {
     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
 };
 
-// Typical DFS
+// backtracking
 class Solution {
-    void dfs(TreeNode *root, vector<int> &curPath, vector<vector<int>> &results) {
+    string buildPath(vector<int> &path) {
+        int n = path.size();
+        string s = to_string(path[0]);
+        for (int i=1; i<n; ++i) {
+            s += "->";
+            s += to_string(path[i]);
+        }
+        return s;
+    }
+    void solve(TreeNode *root, vector<int> &path, vector<string> &paths) {
         if (!root) return;
-        curPath.push_back(root->val);
-        bool isLeaf = true;
+        path.push_back(root->val);
         if (root->left) {
-            isLeaf = false;
-            dfs(root->left, curPath, results);
+            solve(root->left, path, paths);
         }
         if (root->right) {
-            isLeaf = false;
-            dfs(root->right, curPath, results);
+            solve(root->right, path, paths);
         }
-        if (isLeaf) {
-            results.push_back(curPath);
+        if (!root->left && !root->right) {
+            paths.push_back(buildPath(path));
         }
-        curPath.pop_back();
-    }
-    string buildPath(vector<int> &path) {
-        string sPath = to_string(path[0]);
-        for (int i=1; i<path.size(); ++i) {
-            sPath += "->";
-            sPath += to_string(path[i]);
-        }
-        return sPath;
+        path.pop_back();
     }
 public:
     vector<string> binaryTreePaths(TreeNode* root) {
-        vector<vector<int>> results;
+        vector<int> path;
         vector<string> paths;
-        vector<int> curPath;
-        dfs(root, curPath, results);
-        for (auto &path : results) {
-            paths.push_back(buildPath(path));
-        }
+        solve(root, path, paths);
         return paths;
     }
 };
