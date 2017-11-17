@@ -34,7 +34,7 @@ public:
         long long diff = 0;
         while (true) {
             current = 0;
-            diff = longDividend - (longDivisor>>current);
+            diff = longDividend - longDivisor;
             while (diff >= 0) {
                 longDividend = diff;
                 result += 1<<current;
