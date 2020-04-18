@@ -1,4 +1,4 @@
-/**
+/*
  *
  * Sean
  * 2016-02-27
@@ -20,36 +20,36 @@ using namespace std;
 
 // Move the number to the right place in nums.
 class Solution {
-    public:
-        int firstMissingPositive(vector<int>& nums) {
-            int i;
-            int source, target;
-            for (i=0; i<nums.size(); ++i) {
-                source = nums[i];
-                while (source>0 && source<=nums.size()) {
-                    target = nums[source-1];
-                    nums[source-1] = source;
-                    if (source == target) break;
-                    source = target;
-                }
-            }
+  public:
+    int firstMissingPositive(vector<int>& nums) {
+      int source, target;
+      int n = nums.size();
 
-            for (i=0; i<nums.size(); ++i) {
-                if (nums[i]!=i+1)
-                    break;
-            }
-            return i+1;
+      for (int i=0; i<n; ++i) {
+        source = nums[i];
+        while (source > 0 && source <= n) {
+          target = nums[source-1];
+          if (target == source) break;
+          nums[source-1] = source;
+          source = target;
         }
+      }
+
+      for (int i=0; i<n; ++i) {
+        if (nums[i] != i+1) return i+1;
+      }
+      return n+1;
+    }
 };
 
 int main() {
-    vector<int> nums = {1,2,0};
-    Solution solution;
-    cout << solution.firstMissingPositive(nums) << endl;
+  vector<int> nums = {1,2,0};
+  Solution solution;
+  cout << solution.firstMissingPositive(nums) << endl;
 
-    nums = {3,4,-1,1};
-    cout << solution.firstMissingPositive(nums) << endl;
+  nums = {3,4,-1,1};
+  cout << solution.firstMissingPositive(nums) << endl;
 
-    nums = {4,1,2,3};
-    cout << solution.firstMissingPositive(nums) << endl;
+  nums = {4,1,2,3};
+  cout << solution.firstMissingPositive(nums) << endl;
 }
