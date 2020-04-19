@@ -46,12 +46,13 @@ class Solution {
                 dp[i][i] = { new TreeNode(i) };
 
             Trees empty = {nullptr};
-            for (int j=1; j<n; ++j)
-                for (int i=1; i+j<=n; ++i) {
-                    auto &trees = dp[i][i+j];
-                    for (int root=i; root<=i+j; ++root) {
+            // l represents the length of the range
+            for (int l=1; l<n; ++l)
+                for (int i=1; i+l<=n; ++i) {
+                    auto &trees = dp[i][i+l];
+                    for (int root=i; root<=i+l; ++root) {
                         auto leftTrees = (root-1<i)?empty:dp[i][root-1];
-                        auto rightTrees = (root+1>i+j)?empty:dp[root+1][i+j];
+                        auto rightTrees = (root+1>i+l)?empty:dp[root+1][i+l];
                         for (auto &leftTree : leftTrees) {
                             for (auto &rightTree: rightTrees) {
                                 TreeNode *rootNode = new TreeNode(root);
