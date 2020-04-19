@@ -46,7 +46,7 @@ class Solution {
                 dp[i][i] = { new TreeNode(i) };
 
             Trees empty = {nullptr};
-            // l represents the length of the range
+            // l represents the step, the range is [i, i+l]
             for (int l=1; l<n; ++l)
                 for (int i=1; i+l<=n; ++i) {
                     auto &trees = dp[i][i+l];
