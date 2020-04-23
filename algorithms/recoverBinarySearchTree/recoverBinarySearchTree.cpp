@@ -37,20 +37,10 @@ public:
         inorderTranversal(root, pointers);
 
         int size = pointers.size();
-        for (int i=0; i<size; ++i) {
-            if (i == 0) {
-                if (pointers[i]->val > pointers[i+1]->val) {
-                    wrongPointers.push_back(pointers[i]);
-                }
-            } else if (i == size-1) {
-                if (pointers[i-1]->val > pointers[i]->val) {
-                    wrongPointers.push_back(pointers[i]);
-                }
-            } else {
-                if (pointers[i]->val > pointers[i+1]->val ||
-                    pointers[i-1]->val > pointers[i]->val) {
-                        wrongPointers.push_back(pointers[i]);
-                    }
+        for (int i=0; i<size-1; ++i) {
+            if (pointers[i]->val > pointers[i+1]->val) {
+                wrongPointers.push_back(pointers[i]);
+                wrongPointers.push_back(pointers[i+1]);
             }
         }
 
