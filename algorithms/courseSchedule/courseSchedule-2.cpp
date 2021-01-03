@@ -33,10 +33,10 @@ class Solution {
 public:
     bool canFinish(int numCourses, vector<pair<int, int>>& prerequisites) {
         vector<int> count(numCourses, 0);
-        vector<vector<int>> adjancent(numCourses);
+        vector<vector<int>> adjacents(numCourses);
         for (auto &aPair : prerequisites) {
             ++count[aPair.first];
-            adjancent[aPair.second].push_back(aPair.first);
+            adjacents[aPair.second].push_back(aPair.first);
         }
 
         queue<int> courses;
@@ -51,7 +51,7 @@ public:
         while (!courses.empty()) {
             int cur = courses.front();
             courses.pop();
-            for (auto &next : adjancent[cur]) {
+            for (auto &next : adjacents[cur]) {
                 --count[next];
                 if (count[next] == 0) {
                     ++cnt;
@@ -63,4 +63,6 @@ public:
     }
 };
 
-int main() {}
+int main() {
+  return 0;
+}
