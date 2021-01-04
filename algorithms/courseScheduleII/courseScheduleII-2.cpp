@@ -33,26 +33,26 @@ class Solution {
     const static int BLACK;
 public:
     vector<int> findOrder(int numCourses, vector<pair<int, int>>& prerequisites) {
-        vector<vector<int>> adjancents(numCourses);
+        vector<vector<int>> adjacents(numCourses);
         vector<int> mark(numCourses, WHITE);
         vector<int> result;
         for (auto &aPair : prerequisites) {
-            // adjancents[i] is all the courses which i dependents on
-            adjancents[aPair.first].push_back(aPair.second);
+            // adjacents[i] is all the courses which i dependents on
+            adjacents[aPair.first].push_back(aPair.second);
         }
         for (int i=0; i<numCourses; ++i) {
-            if (mark[i] == WHITE && !dfsVisit(i, adjancents, mark, result)) {
+            if (mark[i] == WHITE && !dfsVisit(i, adjacents, mark, result)) {
                 return vector<int>();
             }
         }
         return result;
     }
 
-    bool dfsVisit(int cur, vector<vector<int>> &adjancents, vector<int> &mark, vector<int> &result) {
+    bool dfsVisit(int cur, vector<vector<int>> &adjacents, vector<int> &mark, vector<int> &result) {
         mark[cur] = GRAY;
-        for (auto &neighbour : adjancents[cur])
+        for (auto &neighbour : adjacents[cur])
             if (mark[neighbour] == GRAY ||
-                (mark[neighbour] == WHITE && !dfsVisit(neighbour, adjancents, mark, result)))
+                (mark[neighbour] == WHITE && !dfsVisit(neighbour, adjacents, mark, result)))
                 return false;
         mark[cur] = BLACK;
         result.push_back(cur);
